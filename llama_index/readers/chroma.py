@@ -31,9 +31,7 @@ class ChromaReader(BaseReader):
             raise ValueError("Please provide a collection name.")
         from chromadb.config import Settings
 
-        self._client = chromadb.Client(
-            Settings(**client_settings)
-        )
+        self._client = chromadb.Client(Settings(**client_settings))
         self._collection = self._client.get_collection(collection_name)
 
     def create_documents(self, results: Any) -> List[Document]:
@@ -70,7 +68,8 @@ class ChromaReader(BaseReader):
         where_document: Optional[dict] = None,
         query: Optional[Union[str, List[str]]] = None,
     ) -> List[Document]:
-        """Load data from the collection.
+        """Load data from the collection. If no query arf is defined all data
+           will be loaded.
 
         Args:
             limit: Number of results to return.
@@ -102,4 +101,9 @@ class ChromaReader(BaseReader):
             )
             return self.create_documents(results)
         else:
-            raise ValueError("Please provide either query embedding or query.")
+            # Load all data from collection
+            results = self._collection.get(
+                include=["metadatas", "documents", "embeddings"]
+            )
+            results = {key: [value] for key, value in results.items()}
+            return self.create_documents(results)
