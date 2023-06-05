@@ -47,16 +47,16 @@ class ChromaReader(BaseReader):
         """
         documents = []
         for result in zip(
-            results["ids"],
-            results["documents"],
-            results["embeddings"],
-            results["metadatas"],
+            results["ids"][0],
+            results["documents"][0],
+            results["embeddings"][0],
+            results["metadatas"][0],
         ):
             document = Document(
-                doc_id=result[0][0],
-                text=result[1][0],
-                embedding=result[2][0],
-                extra_info=result[3][0],
+                doc_id=result[0],
+                text=result[1],
+                embedding=result[2],
+                extra_info=result[3],
             )
             documents.append(document)
 
@@ -69,7 +69,7 @@ class ChromaReader(BaseReader):
         where: Optional[dict] = None,
         where_document: Optional[dict] = None,
         query: Optional[Union[str, List[str]]] = None,
-    ) -> Any:
+    ) -> List[Document]:
         """Load data from the collection.
 
         Args:
