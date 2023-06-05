@@ -13,17 +13,11 @@ class ChromaReader(BaseReader):
 
     Args:
         collection_name: Name of the peristed collection.
-        persist_directory: Directory where the collection is persisted.
+        client_settings: Pass connection settings of chromadb client
 
     """
 
-    def __init__(
-        self,
-        collection_name: str,
-        persist_directory: Optional[str] = None,
-        host: str = "localhost",
-        port: int = 8000,
-    ) -> None:
+    def __init__(self, collection_name: str, **client_settings: Any) -> None:
         """Initialize with parameters."""
         import_err_msg = (
             "`chromadb` package not found, please run `pip install chromadb`"
@@ -38,16 +32,8 @@ class ChromaReader(BaseReader):
         from chromadb.config import Settings
 
         self._client = chromadb.Client(
-            Settings(
-                chroma_api_impl="rest",
-                chroma_server_host=host,
-                chroma_server_http_port=port,
-                persist_directory=persist_directory
-                if persist_directory
-                else "./chroma",
-            )
+            Settings(**client_settings)
         )
-
         self._collection = self._client.get_collection(collection_name)
 
     def create_documents(self, results: Any) -> List[Document]:
